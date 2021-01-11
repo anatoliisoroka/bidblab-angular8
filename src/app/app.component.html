@@ -1,0 +1,108 @@
+<mat-sidenav-container>
+  <mat-sidenav *ngIf="!isMediaActive('gt-xs')" [opened]="'false'" [mode]="'over'" #sidenav
+    class="sidenav mat-elevation-z6">
+    <mat-toolbar [fxLayoutAlign]="'space-between center'" class="sidenav-header">
+      <a class="logo" style="display: flex;" routerLink="/" (click)="closeSubMenus()">
+        <img class="logo-wrap" src="assets/icons/logo.svg" />
+      </a>
+    </mat-toolbar>
+
+    <div fxLayout="column" fxLayoutAlign="center center" class="user-block transition-2" [class.show]="true">
+      <div [fxLayout]="'row'" [fxLayoutAlign]="'space-around center'" class="user-info-wrapper">
+        <img [src]="user?.profilePicture?.path? serverUrl +'/' + user.profilePicture.path : 'assets/imgs/user.svg'"
+          alt="user-image">
+        <div class="user-info">
+          <p class="name">{{user?.username}}</p>
+          <p class="position">Web developer <br> <small class="muted-text">Member since May. 2016</small></p>
+        </div>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="space-around center" class="w-100 muted-text">
+        <a mat-icon-button (click)="logout(); toggleSidenav();">
+          <mat-icon>power_settings_new</mat-icon>
+        </a>
+      </div>
+    </div>
+
+    <perfect-scrollbar #sidenavPS class="sidenav-menu-outer" [class.user-block-show]="true">
+      <span *ngIf="!menuItems">loading....</span>
+      <app-vertical-menu [menuItems]="menuItems" [menuParentId]="0" (onClickMenuItem)="updatePS($event)">
+      </app-vertical-menu>
+      <mat-divider></mat-divider>
+      <app-vertical-menu [menuItems]="menuItems" [menuParentId]="1" (onClickMenuItem)="updatePS($event)">
+      </app-vertical-menu>
+      <mat-divider></mat-divider>
+      <app-vertical-menu [menuItems]="menuItems" [menuParentId]="2" (onClickMenuItem)="updatePS($event)">
+      </app-vertical-menu>
+    </perfect-scrollbar>
+  </mat-sidenav>
+  <mat-sidenav-content id="main">
+    <block-ui>
+      <div class="app-wrapper" id="main-nicescrollable">
+        <div class="app-content-wrap">
+          <header>
+            <mat-toolbar style="background-color: white;">
+              <div class="container" fxLayout="row">
+                <div class="fill-remaining-space">
+                  <button (click)="goHome()" color="primary" class="no-hover-effect" mat-button>
+                    <img class="logo-wrap" src="assets/icons/logo.svg" />
+                  </button>
+                </div>
+                <ng-container *ngIf="isAuthenticated(); else notAuthenticated">
+                  <mat-menu #userMenu="matMenu">
+                    <button (click)="openProfile()" mat-menu-item>Account Information</button>
+                    <button (click)="logout()" mat-menu-item>Logout</button>
+                    <button routerLink="/extra/invite" mat-menu-item>Invite Friend</button>
+                  </mat-menu>
+                  <button *ngIf="isMediaActive('gt-xs')" color="primary" class="no-hover-effect" mat-button
+                    [matMenuTriggerFor]="userMenu">
+                    <div fxLayout="row" fxLayoutAlign="start center">
+                      <div class="avatar margin-right-1rem" [style.background-image]="user?.profilePicture?.path?
+                        'url(' + serverUrl +'/' + user.profilePicture.path + ')' : 'url(assets/imgs/user.svg)'">
+                      </div>
+                      <small class="">{{user.username}}</small>
+                    </div>
+                  </button>
+                  <button *ngIf="!isMediaActive('gt-xs')" mat-icon-button [ngClass]="{'is-active': !menuHidden}"
+                    (click)="toggleSidenav()">
+                    <mat-icon>menu</mat-icon>
+                  </button>
+                </ng-container>
+                <ng-template #notAuthenticated>
+                  <mat-menu #authMenu="matMenu">
+                    <button (click)="openDialog('signup')" mat-menu-item>Signup</button>
+                    <button (click)="openDialog('login')" mat-menu-item>Login</button>
+                  </mat-menu>
+                  <ng-container *ngIf="isMediaActive('gt-xs')">
+                    <div class="buttons-row">
+                      <button (click)="openDialog('signup')" mat-button>Signup</button>
+                      <button (click)="openDialog('login')" mat-button>Login</button>
+                    </div>
+                  </ng-container>
+                  <button *ngIf="!isMediaActive('gt-xs')" mat-icon-button [matMenuTriggerFor]="authMenu">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                </ng-template>
+              </div>
+            </mat-toolbar>
+          </header>
+          <div *ngIf="isMediaActive('gt-xs')" class="container">
+            <div class="tab-nav-wrap">
+              <div mat-tab-nav-bar>
+                <a mat-tab-link *ngFor="let link of mainNavLinks" [routerLink]="link.link" routerLinkActive
+                  #rla="routerLinkActive" [active]="rla.isActive">
+                  {{link.label}}
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="container main-page-wrap">
+            <router-outlet></router-outlet>
+          </div>
+        </div>
+        <div class="sticky-footer-wrap">
+          <app-footer></app-footer>
+        </div>
+      </div>
+    </block-ui>
+  </mat-sidenav-content>
+</mat-sidenav-container>
